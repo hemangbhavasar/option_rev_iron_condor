@@ -5,8 +5,8 @@ Dependencies:
 yahoo_fin ---> Retrive option/stock data from yahoo fininace
 
 other dependencies:
-ftplib \n
-io \n
-pandas \n
+ftplib 
+io 
+pandas 
 requests
 requests_html
