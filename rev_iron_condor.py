@@ -196,14 +196,14 @@ def main_func(strategy, stock, stock_option_delta_price, exp_dates):
                     table7}
 
         data_frame = pd.DataFrame(data)
-        print("\nData frame REVERSE IRON CONDOR FOR " + exp_date)
-        print("Live price for " + stock + " is : " + str(get_live_price(stock))
-              + ". \n")
         df2 = pd.DataFrame([data_frame['Cost'].max(), datetime.now()])
+        df2 = df2.transpose()
         append_df_to_excel('output.xlsx', data_frame,
                            sheet_name=stock+sheet_name)
         append_df_to_excel('output.xlsx', df2,
-                           sheet_name=stock+sheet_name+"_Min_cost")
+                           sheet_name=stock+sheet_name+"_Min_cost",
+                           index=False, header=None)
+        print("Data was added to excel file : " + str(datetime.now()))
 
 
 # Display all rows and columns from DataFrame
@@ -239,7 +239,7 @@ the week this can be modified to ignore other days of the week."""
 open_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 # -----------------------------------------
 
-schedule.every(30).minutes.do(main_func, strategy, stock,
+schedule.every(15).minutes.do(main_func, strategy, stock,
                              stock_option_delta_price, exp_dates)
 
 
