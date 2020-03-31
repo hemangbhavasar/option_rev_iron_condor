@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Peter AK</author>
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>658</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>70</y>
+     <width>352</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetFixedSize</enum>
+    </property>
+    <item>
+     <widget class="QLineEdit" name="stock_line"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="get_stock_pb">
+      <property name="text">
+       <string>Get stock</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="stock_label">
+      <property name="text">
+       <string>No stock selected</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QCheckBox" name="stock_status">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>90</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Status</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>170</y>
+     <width>389</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QListView" name="list_exp"/>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="exp_add_pb">
+        <property name="text">
+         <string>Add date -&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="exp_remove_pb">
+        <property name="text">
+         <string>&lt;- Remove date</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QListView" name="list_exp_select"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QCheckBox" name="exp_status">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>230</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Status</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="gb_stocks">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>40</y>
+     <width>521</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Select the underlying stock</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="gb_exp_dates">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>150</y>
+     <width>521</width>
+     <height>201</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Select the Experation dates you want to track :</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="gb_strategy">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>350</y>
+     <width>521</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Strategy:</string>
+   </property>
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>19</x>
+      <y>20</y>
+      <width>471</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_leg2">
+       <property name="text">
+        <string>Leg 2:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_leg1">
+       <property name="text">
+        <string>Leg 1:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_leg4">
+       <property name="text">
+        <string>Leg 4:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QComboBox" name="cb_leg1_sell_buy">
+       <item>
+        <property name="text">
+         <string>Sell</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Buy</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_leg3">
+       <property name="text">
+        <string>Leg 3</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QComboBox" name="cb_leg1_put_call">
+       <item>
+        <property name="text">
+         <string>Put</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Call</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cb_leg2_sell_buy">
+       <item>
+        <property name="text">
+         <string>Sell</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Buy</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="cb_leg3_sell_buy">
+       <item>
+        <property name="text">
+         <string>Sell</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Buy</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QComboBox" name="cb_leg4_sell_buy">
+       <item>
+        <property name="text">
+         <string>Sell</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Buy</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cb_leg2_put_call">
+       <item>
+        <property name="text">
+         <string>Put</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Call</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QComboBox" name="cb_leg3_put_call">
+       <item>
+        <property name="text">
+         <string>Put</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Call</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QComboBox" name="cb_leg4_put_call">
+       <item>
+        <property name="text">
+         <string>Put</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Call</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>110</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_2">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>110</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_3">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>110</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_4">
+    <property name="geometry">
+     <rect>
+      <x>475</x>
+      <y>110</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_6">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>123</y>
+      <width>60</width>
+      <height>3</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_7">
+    <property name="geometry">
+     <rect>
+      <x>424</x>
+      <y>123</y>
+      <width>60</width>
+      <height>3</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="Line" name="line_8">
+    <property name="geometry">
+     <rect>
+      <x>415</x>
+      <y>110</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>4</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spin_leg1_2">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>115</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spin_leg2_3">
+    <property name="geometry">
+     <rect>
+      <x>235</x>
+      <y>115</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>20</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spin_leg3_4">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>115</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_strike_price_diff">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>150</y>
+      <width>461</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Strike Price Differance between each leg</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="gb_output">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>540</y>
+     <width>241</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Output File selection :</string>
+   </property>
+   <widget class="QPushButton" name="pb_load">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="load_path_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>241</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>No Path selected</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="gb_start">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>540</y>
+     <width>261</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Start Data Collection</string>
+   </property>
+   <widget class="QLabel" name="label_data">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>161</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Data will be collected every</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spin_ever_min">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>28</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>15</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_min">
+    <property name="geometry">
+     <rect>
+      <x>235</x>
+      <y>30</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>min</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_start">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>60</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_start_info">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>You can start multiple</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_start_info2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>80</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>trackers.</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>0</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Iron Condor price tracker.</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>30</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>By: Peter AK </string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>30</y>
+     <width>61</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>V0.4</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>get_stock_pb</sender>
+   <signal>clicked()</signal>
+   <receiver>stock_label</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>213</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>122</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <designerdata>
+  <property name="gridDeltaX">
+   <number>10</number>
+  </property>
+  <property name="gridDeltaY">
+   <number>10</number>
+  </property>
+  <property name="gridSnapX">
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY">
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible">
+   <bool>true</bool>
+  </property>
+ </designerdata>
+</ui>
