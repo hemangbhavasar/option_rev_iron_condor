@@ -1,7 +1,11 @@
 """
 Rev iron condor analyser
 Written by: Peter Agalakov
-version: v0.4
+version: v0.41
+
+v0.4 (2020-march-31)
+*Created individual legs for multiple strategies
+
 v0.4 (2020-march-31)
 *extracted all the parameters to be global
 *cleaned up and refactored some code to prerp for GUI
@@ -86,7 +90,7 @@ def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
             writer.book.create_sheet(sheet_name, idx)
 
         # copy existing sheets
-        writer.sheets = {ws.title:ws for ws in writer.book.worksheets}
+        writer.sheets = {ws.title: ws for ws in writer.book.worksheets}
     except FileNotFoundError:
         # file does not exist yet, we will create it
         pass
@@ -101,7 +105,8 @@ def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
     writer.save()
 
 
-def get_min_price(p, c, s):
+# noinspection PyUnresolvedReferences
+def get_min_price(p, c, s, legs):
     """4 loops nested in each other, first loop selects the items down the
     dataframe list. The other loops verify that the strategy suggested is
     possible since not all strike prices have the necessary volume. Finally
@@ -118,53 +123,55 @@ def get_min_price(p, c, s):
     o_i = []
     volume = 0
     open_i = 0
+    for leg in legs:
+        if leg[1] == 'put':
+            leg.append(p)
+        elif leg[1] == 'call':
+            leg.append(c)
 
-    for i in range(len(p)):
-        base_strike_price = p.loc[i, 'Strike']
-        puts_sell_price = p.loc[i, 'Mid']
-        volume += int(p.loc[i, 'Volume'])
-        open_i += int(p.loc[i, 'Open Interest'])
-        for l in range(len(p)):
-            if base_strike_price + s[0] == p.loc[l, 'Strike']:
-                puts_buy_price = p.loc[l, 'Mid']
-                strike_put_buy = p.loc[l, 'Strike']
-                volume += int(p.loc[l, 'Volume'])
-                open_i += int(p.loc[l, 'Open Interest'])
-                for m in range(len(c)):
-                    if base_strike_price + s[0] + s[1] == c.loc[m, 'Strike']:
-                        call_buy_price = c.loc[m, 'Mid']
-                        strike_call_buy = c.loc[m, 'Strike']
-                        volume += int(c.loc[m, 'Volume'])
-                        open_i += int(c.loc[m, 'Open Interest'])
-                        for n in range(len(c)):
+    for i in range(len(leg1[2])):
+        base_strike_price = leg1[2].loc[i, 'Strike']
+        puts_sell_price = leg1[2].loc[i, 'Mid']
+        volume += int(leg1[2].loc[i, 'Volume'])
+        open_i += int(leg1[2].loc[i, 'Open Interest'])
+        for l in range(len(leg2[2])):
+            if base_strike_price + s[0] == leg2[2].loc[l, 'Strike']:
+                puts_buy_price = leg2[2].loc[l, 'Mid']
+                strike_put_buy = leg2[2].loc[l, 'Strike']
+                volume += int(leg2[2].loc[l, 'Volume'])
+                open_i += int(leg2[2].loc[l, 'Open Interest'])
+                for m in range(len(leg3[2])):
+                    if base_strike_price + s[0] + s[1] == leg3[2].loc[m, 'Strike']:
+                        call_buy_price = leg3[2].loc[m, 'Mid']
+                        strike_call_buy = leg3[2].loc[m, 'Strike']
+                        volume += int(leg3[2].loc[m, 'Volume'])
+                        open_i += int(leg3[2].loc[m, 'Open Interest'])
+                        for n in range(len(leg4[2])):
                             if base_strike_price + s[0] + s[1] + s[2] == \
-                                    c.loc[n, 'Strike']:
-                                call_sell_price = c.loc[n, 'Mid']
-                                strike_call_sell = c.loc[n, 'Strike']
-                                volume = int(c.loc[n, 'Volume'])
-                                open_i = int(c.loc[n, 'Open Interest'])
+                                    leg4[2].loc[n, 'Strike']:
+                                call_sell_price = leg4[2].loc[n, 'Mid']
+                                strike_call_sell = leg4[2].loc[n, 'Strike']
+                                volume = int(leg4[2].loc[n, 'Volume'])
+                                open_i = int(leg4[2].loc[n, 'Open Interest'])
                                 value = gen_price_value(puts_sell_price,
                                                         puts_buy_price,
                                                         call_buy_price,
                                                         call_sell_price,
-                                                        )
+                                                        legs)
                                 gen_price_slot.append(value)
                                 s_put.append(base_strike_price)
                                 b_put.append(strike_put_buy)
                                 b_call.append(strike_call_buy)
                                 s_call.append(strike_call_sell)
-                                v.append(volume/4)
-                                o_i.append(open_i/4)
+                                v.append(volume / 4)
+                                o_i.append(open_i / 4)
     return gen_price_slot, s_put, b_put, b_call, s_call, v, o_i
 
 
-def gen_price_value(p_s_p, p_b_p, c_b_p, c_s_p):
-    global leg1
-    global leg2
-    global leg3
-    global leg4
-    value = (leg1 * p_s_p) + (leg2 * p_b_p) + (leg3 * c_b_p) +\
-            (leg4 * c_s_p)
+def gen_price_value(p_s_p, p_b_p, c_b_p, c_s_p, legs):
+    value = (legs[0][0] * p_s_p) + (legs[1][0] * p_b_p) + (legs[2][0] *
+                                                           c_b_p) \
+            + (legs[3][0] * c_s_p)
     value = np.around(value, decimals=2)
     return value
 
@@ -196,10 +203,10 @@ def get_df(o_df):
     return o_df
 
 
-def f_df_func(strategy, stock, exp_dates):
+def f_df_func(strategy, stock, exp_dates, legs):
     for exp_date in exp_dates:
         sheet_name = str(exp_date[0:4]) + str(exp_date[5:7]) + str(exp_date[
-                                                                       8:10])
+                                                                   8:10])
         # Get put price DataFrame and filter it down to get the necessary
         # columns
         puts_price = get_df(get_puts(stock, exp_date))
@@ -211,7 +218,7 @@ def f_df_func(strategy, stock, exp_dates):
         # Use get_min_price function to obtain a DataFrame with all the price
         # for each leg + Volume + Open interest
         table1, table2, table3, table4, table5, table6, table7 = get_min_price(
-            puts_price, calls_price, strategy)
+            puts_price, calls_price, strategy,legs)
 
         data = {'Cost': table1, 'Sell_puts': table2, 'Buy_puts': table3,
                 'Buy_calls': table4, 'Sell_calls': table5, 'Volume': table6,
@@ -222,9 +229,9 @@ def f_df_func(strategy, stock, exp_dates):
         df2 = pd.DataFrame([data_frame['Cost'].max(), datetime.now()])
         df2 = df2.transpose()
         append_df_to_excel('output.xlsx', data_frame,
-                           sheet_name=stock+sheet_name)
+                           sheet_name=stock + sheet_name)
         append_df_to_excel('output.xlsx', df2,
-                           sheet_name=stock+sheet_name+"_Min_cost",
+                           sheet_name=stock + sheet_name + "_Min_cost",
                            index=False, header=None)
         print("Data was added to excel file for:" + stock + " @ " + str(
             datetime.now()))
@@ -256,7 +263,7 @@ strategy = [5, 10, 5]
 exp_dates = ['2020/04/17', '2020/05/15']  # string format 'yyyy/mm/dd'
 
 """The time interval variable in minutes that the data is collected"""
-timer = 15  # in minutes
+timer = 1  # in minutes
 """THe days the stock market is open, if trading on only specific days of 
 the week this can be modified to ignore other days of the week."""
 open_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -264,16 +271,17 @@ open_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 volume_filter = 50
 
 """Buy or sell the current legs (1 = sell, -1 = buy)"""
-leg1 = 1
-leg2 = -1
-leg3 = -1
-leg4 = 1
+leg1 = [1, 'put']
+leg2 = [-1, 'put']
+leg3 = [-1, 'call']
+leg4 = [1, 'call']
+
+legs = [leg1, leg2, leg3, leg4]
 # -----------------------------------------
 
 
 schedule.every(timer).minutes.do(f_df_func, strategy, stock, exp_dates,
-                                 volume_filter)
-
+                                 legs)
 
 while True:
     now = datetime.now()
