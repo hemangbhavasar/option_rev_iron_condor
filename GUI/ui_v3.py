@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_file.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.2
-#
-# WARNING! All changes made in this file will be lost!
+"""
+Main GUI Window for Iron condor price tracker
+Written by: Peter Agalakov
+version: v0.1(04-April-2020)
+
+V0.1
+*Initial release for main window
+"""
 
 
 from yahoo_fin.options import *
 from yahoo_fin.stock_info import *
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView, QFileDialog
 import numpy as np
 import requests
 
@@ -19,6 +22,8 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(560, 660)
+        self.stock_string = QtWidgets.QLabel()
+        self.stock_string.setVisible(False)
         self.gb_stocks = QtWidgets.QGroupBox(Form)
         self.gb_stocks.setGeometry(QtCore.QRect(20, 40, 521, 101))
         self.gb_stocks.setObjectName("gb_stocks")
@@ -51,11 +56,7 @@ class Ui_Form(object):
         self.stock_label = QtWidgets.QLabel(self.horizontalLayoutWidget)
         self.stock_label.setObjectName("stock_label")
         self.horizontalLayout.addWidget(self.stock_label)
-        self.stock_status = QtWidgets.QCheckBox(Form)
-        self.stock_status.setGeometry(QtCore.QRect(470, 90, 81, 20))
-        self.stock_status.setCheckable(False)
-        self.stock_status.setChecked(False)
-        self.stock_status.setObjectName("stock_status")
+
         self.horizontalLayoutWidget_2 = QtWidgets.QWidget(Form)
         self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(30, 170, 389, 161))
         self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
@@ -77,11 +78,6 @@ class Ui_Form(object):
         self.list_exp_select = QtWidgets.QListWidget(self.horizontalLayoutWidget_2)
         self.list_exp_select.setObjectName("list_exp_select")
         self.horizontalLayout_2.addWidget(self.list_exp_select)
-        self.exp_status = QtWidgets.QCheckBox(Form)
-        self.exp_status.setGeometry(QtCore.QRect(470, 230, 81, 20))
-        self.exp_status.setCheckable(False)
-        self.exp_status.setChecked(False)
-        self.exp_status.setObjectName("exp_status")
 
         self.label_leg2 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.label_leg2.setObjectName("label_leg2")
@@ -201,12 +197,13 @@ class Ui_Form(object):
         self.gb_output = QtWidgets.QGroupBox(Form)
         self.gb_output.setGeometry(QtCore.QRect(20, 540, 241, 101))
         self.gb_output.setObjectName("gb_output")
-        self.pb_load = QtWidgets.QPushButton(self.gb_output)
-        self.pb_load.setGeometry(QtCore.QRect(10, 30, 93, 28))
-        self.pb_load.setObjectName("pb_load")
         self.load_path_label = QtWidgets.QLabel(self.gb_output)
-        self.load_path_label.setGeometry(QtCore.QRect(10, 70, 241, 20))
+        self.load_path_label.setGeometry(QtCore.QRect(10, 50, 240, 40))
         self.load_path_label.setObjectName("load_path_label")
+        self.load_path_label.setWordWrap(True)
+        self.pb_load = QtWidgets.QPushButton(self.gb_output)
+        self.pb_load.setGeometry(QtCore.QRect(10, 20, 93, 28))
+        self.pb_load.setObjectName("pb_load")
         self.gb_start = QtWidgets.QGroupBox(Form)
         self.gb_start.setGeometry(QtCore.QRect(280, 540, 261, 101))
         self.gb_start.setObjectName("gb_start")
@@ -244,6 +241,8 @@ class Ui_Form(object):
         self.get_stock_pb.clicked.connect(self.on_click_get_stock)
         self.exp_add_pb.clicked.connect(self.on_click_add_item)
         self.exp_remove_pb.clicked.connect(self.on_click_remove_item)
+        self.pb_load.clicked.connect(self.set_path_label)
+        self.pb_start.clicked.connect(self.on_click_start)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
@@ -251,12 +250,14 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Iron Condor Tracker"))
         self.get_stock_pb.setText(_translate("Form", "Get stock"))
         self.stock_label.setText("No Stock Selected")
-        self.stock_status.setText(_translate("Form", "Status"))
+
         self.exp_add_pb.setText(_translate("Form", "Add date ->"))
         self.exp_remove_pb.setText(_translate("Form", "<- Remove date"))
-        self.exp_status.setText(_translate("Form", "Status"))
-        self.gb_stocks.setTitle(_translate("Form", "Select the underlying stock"))
-        self.gb_exp_dates.setTitle(_translate("Form", "Select the Experation dates you want to track :"))
+
+        self.gb_stocks.setTitle(_translate("Form", "Select the underlying  "
+                                                   "stock"))
+        self.gb_exp_dates.setTitle(_translate("Form",  "Select the "
+                                    "Expiration dates you want to track :"))
         self.gb_strategy.setTitle(_translate("Form", "Strategy:"))
         self.label_leg2.setText(_translate("Form", "Leg 2:"))
         self.label_leg1.setText(_translate("Form", "Leg 1:"))
@@ -278,27 +279,34 @@ class Ui_Form(object):
         self.cb_leg3_put_call.setItemText(1, _translate("Form", "Call"))
         self.cb_leg4_put_call.setItemText(0, _translate("Form", "Put"))
         self.cb_leg4_put_call.setItemText(1, _translate("Form", "Call"))
-        self.label_strike_price_diff.setText(_translate("Form", "Strike Price Differance between each leg"))
+        self.label_strike_price_diff.setText(_translate("Form",
+                    "Strike Price Difference between each leg"))
+
         self.gb_output.setTitle(_translate("Form", "Output File selection :"))
         self.pb_load.setText(_translate("Form", "Load"))
         self.load_path_label.setText(_translate("Form", "No Path selected"))
         self.gb_start.setTitle(_translate("Form", "Start Data Collection"))
-        self.label_data.setText(_translate("Form", "Data will be collected every"))
+        self.label_data.setText(_translate("Form",  "Data will be collected "
+                                                    "every"))
+
         self.label_min.setText(_translate("Form", "min"))
         self.pb_start.setText(_translate("Form", "Start"))
-        self.label_start_info.setText(_translate("Form", "You can start multiple"))
+        self.label_start_info.setText(_translate("Form", "You can start  "
+                                                         "multiple"))
+
         self.label_start_info2.setText(_translate("Form", "trackers."))
         self.label_6.setText(_translate("Form", "Iron Condor price tracker."))
         self.label_7.setText(_translate("Form", "By: Peter AK "))
         self.label_8.setText(_translate("Form", "V0.4"))
 
     def on_click_get_stock(self):
+        """Get the stock value and fill the exipration dates """
         stock_value = self.stock_line.text()
+        self.stock_string.setText(stock_value)
         try:
             label_value = get_live_price(stock_value)
             exp_date_list = get_expiration_dates(stock_value)
             self.stock_label.setText(str(np.around(label_value, decimals=2)))
-            self.stock_status.setChecked(True)
             self.list_exp.addItems(exp_date_list)
 
         except requests.ConnectionError:
@@ -307,14 +315,50 @@ class Ui_Form(object):
             self.stock_label.setText("Stock could not be found")
 
     def on_click_add_item(self):
+        """Add one selected item to the selected expiration list"""
         selected_index = [x.row() for x in self.list_exp.selectedIndexes()]
         selected_index = selected_index[0]
         self.list_exp_select.addItem(self.list_exp.takeItem(selected_index))
 
     def on_click_remove_item(self):
-        selected_index = [x.row() for x in self.list_exp_select.selectedIndexes()]
+        """Remove one selected item from the selected expiration list"""
+        selected_index = [x.row() for x in
+                          self.list_exp_select.selectedIndexes()]
         selected_index = selected_index[0]
         self.list_exp.addItem(self.list_exp_select.takeItem(selected_index))
+
+    def set_path_label(self):
+        """Lets the user select the output files (as an excel file only (
+        xlsx) and then sets this path to the label"""
+        qfd = QFileDialog()
+        fileName = QFileDialog().getOpenFileName(qfd, "Select a file", '',
+                                                 "xlsx(*.xlsx)")
+        filePath = str(fileName[0])
+        self.load_path_label.setText(filePath)
+
+    def on_click_start(self):
+        """Loads all the necessary parameters into the main backend function"""
+        stock = self.stock_string.text()
+        exp_date_list = [self.list_exp_select.item(i).text() for i in
+                         range(self.list_exp_select.count())]
+        leg1 = [self.cb_leg1_put_call.currentText(),
+               self.cb_leg1_sell_buy.currentText()]
+        leg2 = [self.cb_leg2_put_call.currentText(),
+                self.cb_leg2_sell_buy.currentText()]
+        leg3 = [self.cb_leg3_put_call.currentText(),
+                self.cb_leg3_sell_buy.currentText()]
+        leg4 = [self.cb_leg4_put_call.currentText(),
+                self.cb_leg4_sell_buy.currentText()]
+        leg1_2_strat = self.spin_leg1_2.value()
+        leg2_3_strat = self.spin_leg2_3.value()
+        leg3_4_strat = self.spin_leg3_4.value()
+        file_path = self.load_path_label.text()
+        print(stock)
+        print(exp_date_list)
+        print(leg1, leg2, leg3, leg4)
+        print(leg1_2_strat, leg2_3_strat, leg3_4_strat)
+        print(file_path)
+
 
 
 
