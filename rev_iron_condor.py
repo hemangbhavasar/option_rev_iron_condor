@@ -1,7 +1,12 @@
 """
 Rev iron condor analyser
 Written by: Peter Agalakov
-version: v0.41
+version: v0.42(2020-april-09)
+
+V0.42(2020-april-09)
+*Use last price instead of Mid
+*Added a filter to output of 150
+*Fixed market time
 
 v0.41 (2020-march-31)
 *Created individual legs for multiple strategies
@@ -120,9 +125,8 @@ def get_min_price(p, c, s, legs):
     leg3_list = []
     leg4_list = []
     v = []
-    o_i = []
     volume = 0
-    open_i = 0
+
     for leg in legs:
         if leg[1] == 'put':
             leg.append(p)
@@ -131,28 +135,24 @@ def get_min_price(p, c, s, legs):
 
     for i in range(len(leg1[2])):
         leg1_strike_price = leg1[2].loc[i, 'Strike']
-        leg1_price = leg1[2].loc[i, 'Mid']
+        leg1_price = leg1[2].loc[i, 'Last Price']
         volume += int(leg1[2].loc[i, 'Volume'])
-        open_i += int(leg1[2].loc[i, 'Open Interest'])
         for l in range(len(leg2[2])):
             if leg1_strike_price + s[0] == leg2[2].loc[l, 'Strike']:
                 leg2_strike_price = leg2[2].loc[l, 'Strike']
-                leg2_price = leg2[2].loc[l, 'Mid']
+                leg2_price = leg2[2].loc[l, 'Last Price']
                 volume += int(leg2[2].loc[l, 'Volume'])
-                open_i += int(leg2[2].loc[l, 'Open Interest'])
                 for m in range(len(leg3[2])):
                     if leg1_strike_price + s[0] + s[1] == leg3[2].loc[m, 'Strike']:
                         leg3_strike_price = leg3[2].loc[m, 'Strike']
-                        leg3_price = leg3[2].loc[m, 'Mid']
+                        leg3_price = leg3[2].loc[m, 'Last Price']
                         volume += int(leg3[2].loc[m, 'Volume'])
-                        open_i += int(leg3[2].loc[m, 'Open Interest'])
                         for n in range(len(leg4[2])):
                             if leg1_strike_price + s[0] + s[1] + s[2] == \
                                     leg4[2].loc[n, 'Strike']:
                                 leg4_strike_price = leg4[2].loc[n, 'Strike']
-                                leg4_price = leg4[2].loc[n, 'Mid']
+                                leg4_price = leg4[2].loc[n, 'Last Price']
                                 volume = int(leg4[2].loc[n, 'Volume'])
-                                open_i = int(leg4[2].loc[n, 'Open Interest'])
                                 value = gen_price_value(leg1_price,
                                                         leg2_price,
                                                         leg3_price,
@@ -164,8 +164,8 @@ def get_min_price(p, c, s, legs):
                                 leg3_list.append(leg3_strike_price)
                                 leg4_list.append(leg4_strike_price)
                                 v.append(volume / 4)
-                                o_i.append(open_i / 4)
-    return gen_price_slot, leg1_list, leg2_list, leg3_list, leg4_list, v, o_i
+
+    return gen_price_slot, leg1_list, leg2_list, leg3_list, leg4_list, v
 
 
 def gen_price_value(l1_p, l2_p, l3_p, l4_p, legs):
@@ -192,13 +192,9 @@ def filter_volume(df):
 def get_df(o_df):
     """ Function that filters, converts and rearranges the original
     data frame"""
-    o_df = o_df[['Strike', 'Bid', 'Ask', 'Volume', 'Open Interest']]
+    o_df = o_df[['Strike', 'Last Price', 'Volume']]
     o_df = filter_blank(o_df, 'Volume')
     o_df = filter_volume(o_df)
-    o_df['Bid'] = pd.to_numeric(o_df['Bid'])
-    o_df['Ask'] = pd.to_numeric(o_df['Ask'])
-    mid = (o_df['Bid'] + o_df['Ask']) / 2
-    o_df['Mid'] = mid
     o_df = o_df.reset_index()
     return o_df
 
@@ -217,15 +213,14 @@ def f_df_func(strategy, stock, exp_dates, legs):
 
         # Use get_min_price function to obtain a DataFrame with all the price
         # for each leg + Volume + Open interest
-        table1, table2, table3, table4, table5, table6, table7 = get_min_price(
+        table1, table2, table3, table4, table5, table6 = get_min_price(
             puts_price, calls_price, strategy, legs)
 
         data = {'Cost': table1, 'Sell_puts': table2, 'Buy_puts': table3,
-                'Buy_calls': table4, 'Sell_calls': table5, 'Volume': table6,
-                'Open Interest':
-                    table7}
+                'Buy_calls': table4, 'Sell_calls': table5, 'Volume': table6}
 
         data_frame = pd.DataFrame(data)
+        data_frame = filter_volume(data_frame)
         df2 = pd.DataFrame([data_frame['Cost'].max(), datetime.now()])
         df2 = df2.transpose()
         append_df_to_excel('output.xlsx', data_frame,
@@ -260,7 +255,7 @@ ex: 10/20/10 -->> 240/250/270/280
 strategy = [5, 10, 5]
 variation = [2, 2, 2]
 """Enter the list of expiration dates for contracts """
-exp_dates = ['2020/04/17', '2020/05/15']  # string format 'yyyy/mm/dd'
+exp_dates = ['2020/05/15']  # string format 'yyyy/mm/dd'
 
 """The time interval variable in minutes that the data is collected"""
 timer = 15  # in minutes
@@ -268,7 +263,7 @@ timer = 15  # in minutes
 the week this can be modified to ignore other days of the week."""
 open_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
-volume_filter = 50
+volume_filter = 150
 
 """Buy or sell the current legs (1 = sell, -1 = buy)"""
 leg1 = [1, 'put']
@@ -289,8 +284,8 @@ while True:
     s_s_m = (now - now.replace(hour=0, minute=0, second=0,
                                microsecond=0)).total_seconds()
     # 34200 : 09h30
-    # 59400 : 16h30
-    if 34200 < s_s_m < 59400 and day in open_days:
+    # 57600 : 16h00
+    if 34200 < s_s_m < 57600 and day in open_days:
         schedule.run_pending()
         time.sleep(1)
     else:
