@@ -1,10 +1,13 @@
 """
 Rev iron condor analyser
 Written by: Peter Agalakov
-version: v0.43(2020-april-11)
+version: v0.431(2020-april-11)
 
-v0.43 (2020-april-11)
-*Fixed volume calculation error
+
+v0.431 (2020-april-11)
+* Fixed volume calculation error
+* Removed scheduler module and manually implemented a fetch timer
+* Minor fixes
 
 V0.42(2020-april-09)
 *Use last price instead of Mid
@@ -38,7 +41,6 @@ import pandas as pd
 from yahoo_fin.options import *
 from yahoo_fin.stock_info import *
 from datetime import datetime
-import schedule
 import time
 from openpyxl import load_workbook
 
@@ -128,7 +130,6 @@ def get_min_price(p, c, s, legs):
     leg3_list = []
     leg4_list = []
     v = []
-    volume = 0
 
     for leg in legs:
         if leg[1] == 'put':
@@ -174,9 +175,8 @@ def get_min_price(p, c, s, legs):
 
 
 def gen_price_value(l1_p, l2_p, l3_p, l4_p, legs):
-    value = (legs[0][0] * l1_p) + (legs[1][0] * l2_p) + (legs[2][0] *
-                                                         l3_p) \
-            + (legs[3][0] * l4_p)
+    value = (legs[0][0] * l1_p) + (legs[1][0] * l2_p) + \
+            (legs[2][0] * l3_p) + (legs[3][0] * l4_p)
     value = np.around(value, decimals=2)
     return value
 
@@ -188,7 +188,7 @@ def filter_blank(df, col):
 
 
 def filter_volume(df):
-    """Filter by volume, default min 50 volume"""
+    """Filter the data frame by volume"""
     global volume_filter
     vol_filter = pd.to_numeric(df['Volume']) > volume_filter
     return df[vol_filter]
@@ -219,7 +219,7 @@ def f_df_func(strategy, stock, exp_dates, legs):
         calls_price = get_df(calls_price)
 
         # Use get_min_price function to obtain a DataFrame with all the price
-        # for each leg + Volume + Open interest
+        # for each leg + Volume
         table1, table2, table3, table4, table5, table6 = get_min_price(
             puts_price, calls_price, strategy, legs)
 
@@ -248,10 +248,10 @@ pd.set_option('display.max_columns', None)
 pd.set_option("max_rows", None)
 # Suppresses scientific notation when filling our lists
 np.set_printoptions(suppress=True)
-now = datetime.now()
-day = now.strftime("%A")
-s_s_m = (now - now.replace(hour=0, minute=0, second=0,
-                           microsecond=0)).total_seconds()
+# now = datetime.now()
+# day = now.strftime("%A")
+# s_s_m = (now - now.replace(hour=0, minute=0, second=0,
+#                            microsecond=0)).total_seconds()
 # -----------------------------------------
 
 # Constant parameter to be modified by user
@@ -268,7 +268,8 @@ variation = [2, 2, 2]
 exp_dates = ['2020/05/15']  # string format 'yyyy/mm/dd'
 
 """The time interval variable in minutes that the data is collected"""
-timer = 1  # in minutes
+timer = 600  # in seconds
+
 """THe days the stock market is open, if trading on only specific days of 
 the week this can be modified to ignore other days of the week."""
 open_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
@@ -285,9 +286,6 @@ legs = [leg1, leg2, leg3, leg4]
 # -----------------------------------------
 
 
-schedule.every(timer).minutes.do(f_df_func, strategy, stock,
-                                 exp_dates, legs)
-
 while True:
     now = datetime.now()
     day = now.strftime("%A")
@@ -296,8 +294,8 @@ while True:
     # 34200 : 09h30
     # 57600 : 16h00
     if 34200 < s_s_m < 57600 and day in open_days:
-        schedule.run_pending()
-        time.sleep(600)
+        f_df_func(strategy, stock, exp_dates, legs)
+        time.sleep(timer)
     else:
         print("Markets are now closed, the tracker is on stand-by ")
         time.sleep(900)
