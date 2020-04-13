@@ -223,13 +223,16 @@ def f_df_func(strategy, stock, exp_dates, legs):
         data_frame = filter_volume(data_frame)
         df2 = pd.DataFrame([data_frame['Cost'].max(), datetime.now()])
         df2 = df2.transpose()
-        append_df_to_excel('output.xlsx', data_frame,
-                           sheet_name=stock + sheet_name)
-        append_df_to_excel('output.xlsx', df2,
-                           sheet_name=stock + sheet_name + "_Min_cost",
-                           index=False, header=None)
+        # append_df_to_excel('output.xlsx', data_frame,
+        #                    sheet_name=stock + sheet_name)
+        # append_df_to_excel('output.xlsx', df2,
+        #                    sheet_name=stock + sheet_name + "_Min_cost",
+        #                    index=False, header=None)
         print("Data was added to excel file for:" + stock + " @ " + str(
             datetime.now()))
+        print(df2)
+        print("\n")
+        print(data_frame)
 
 
 # Setup-------------------------------------
