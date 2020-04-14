@@ -1,10 +1,10 @@
 """
 Rev iron condor analyser
 Written by: Peter Agalakov
-version: v0.431(2020-april-11)
+version: v0.432(2020-april-11)
 
 
-v0.431 (2020-april-11)
+v0.432 (2020-april-11)
 * Fixed volume calculation error
 * Removed scheduler module and manually implemented a fetch timer
 * Minor fixes
@@ -242,16 +242,28 @@ def f_df_func(strategy, stock, exp_dates, legs):
         print(df2.to_string(index=False))
 
 
+def scan(strategy, stock, exp_dates, legs, timer):
+    while True:
+        now = datetime.now()
+        day = now.strftime("%A")
+        s_s_m = (now - now.replace(hour=0, minute=0, second=0,
+                                   microsecond=0)).total_seconds()
+        # 34200 : 09h30
+        # 57600 : 16h00
+        if 34200 < s_s_m < 57600 and day in open_days:
+            f_df_func(strategy, stock, exp_dates, legs)
+            time.sleep(timer)
+        else:
+            print("Markets are now closed, the tracker is on stand-by ")
+            time.sleep(900)
+
+
 # Setup-------------------------------------
 # Display all rows and columns from DataFrame
 pd.set_option('display.max_columns', None)
 pd.set_option("max_rows", None)
 # Suppresses scientific notation when filling our lists
 np.set_printoptions(suppress=True)
-# now = datetime.now()
-# day = now.strftime("%A")
-# s_s_m = (now - now.replace(hour=0, minute=0, second=0,
-#                            microsecond=0)).total_seconds()
 # -----------------------------------------
 
 # Constant parameter to be modified by user
@@ -285,17 +297,4 @@ leg4 = [1, 'call']
 legs = [leg1, leg2, leg3, leg4]
 # -----------------------------------------
 
-
-while True:
-    now = datetime.now()
-    day = now.strftime("%A")
-    s_s_m = (now - now.replace(hour=0, minute=0, second=0,
-                               microsecond=0)).total_seconds()
-    # 34200 : 09h30
-    # 57600 : 16h00
-    if 34200 < s_s_m < 57600 and day in open_days:
-        f_df_func(strategy, stock, exp_dates, legs)
-        time.sleep(timer)
-    else:
-        print("Markets are now closed, the tracker is on stand-by ")
-        time.sleep(900)
+scan(strategy, stock, exp_dates, legs, timer)
