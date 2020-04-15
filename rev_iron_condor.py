@@ -1,7 +1,10 @@
 """
 Rev iron condor analyser
 Written by: Peter Agalakov
-version: v0.432(2020-april-11)
+version: v0.44(2020-april-11)
+
+v0.44 (2020-april-14)
+* Refactoring + OOP
 
 
 v0.432 (2020-april-11)
@@ -43,6 +46,7 @@ from yahoo_fin.stock_info import *
 from datetime import datetime
 import time
 from openpyxl import load_workbook
+from settings import Settings, setup
 
 
 def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
@@ -242,7 +246,7 @@ def f_df_func(strategy, stock, exp_dates, legs):
         print(df2.to_string(index=False))
 
 
-def scan(strategy, stock, exp_dates, legs, timer):
+def scan(strategy, stock, exp_dates, legs, timer, open_days):
     while True:
         now = datetime.now()
         day = now.strftime("%A")
@@ -258,35 +262,10 @@ def scan(strategy, stock, exp_dates, legs, timer):
             time.sleep(900)
 
 
-# Setup-------------------------------------
-# Display all rows and columns from DataFrame
-pd.set_option('display.max_columns', None)
-pd.set_option("max_rows", None)
-# Suppresses scientific notation when filling our lists
-np.set_printoptions(suppress=True)
-# -----------------------------------------
+setup()
 
-# Constant parameter to be modified by user
-# -----------------------------------------
-"""The ticket or the underlying stock"""
-stock = 'spy'
-"""
-The interval desired for each leg of the iron condor in dollars.
-ex: 10/20/10 -->> 240/250/270/280
-"""
-strategy = [5, 10, 5]
-variation = [2, 2, 2]
-"""Enter the list of expiration dates for contracts """
-exp_dates = ['2020/05/15']  # string format 'yyyy/mm/dd'
+log1 = Settings()
 
-"""The time interval variable in minutes that the data is collected"""
-timer = 600  # in seconds
-
-"""THe days the stock market is open, if trading on only specific days of 
-the week this can be modified to ignore other days of the week."""
-open_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
-volume_filter = 500
 
 """Buy or sell the current legs (1 = sell, -1 = buy)"""
 leg1 = [1, 'put']
@@ -297,4 +276,5 @@ leg4 = [1, 'call']
 legs = [leg1, leg2, leg3, leg4]
 # -----------------------------------------
 
-scan(strategy, stock, exp_dates, legs, timer)
+scan(log1.strategy, log1.stock, log1.exp_dates, legs, log1.timer,
+     log1.open_days)
