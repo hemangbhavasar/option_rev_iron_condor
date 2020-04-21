@@ -13,19 +13,6 @@ def setup():
     np.set_printoptions(suppress=True)
 
 
-def call_put_lists(stock, exp_date):
-    # Get put price DataFrame and filter it down to get the necessary
-    # columns
-    puts_list = get_puts(stock, exp_date)
-    # puts_price = get_df(puts_price)
-
-    # Get put price DataFrame and filter it down to get the necessary
-    # columns
-    calls_list = get_calls(stock, exp_date)
-    # calls_price = get_df(calls_price)
-    return puts_list, calls_list
-
-
 def filter_blank(df, col):
     """Filter empty spaces"""
     df_filter = df[col] != '-'
@@ -85,11 +72,11 @@ class Settings:
                           'Friday']
         # The minimum volume for each option to be collected.
         self.volume_filter = volume_filter
+        # Empty put and call list that will be assigned to legs once log
+        # starts running using get_call_put_lists and leg_assignments
         self.put_list = None
         self.call_list = None
-        # self.get_call_put_lists()
-        # Create the DataFrames for future use in filling in put and call
-        # tables + sell/buy
+
         self.leg1 = None
         self.leg2 = None
         self.leg3 = None
@@ -115,12 +102,15 @@ class Settings:
         return o_df
 
     def get_call_put_lists(self):
-        self.put_list, self.call_list = call_put_lists(self.stock,
-                                                      self.exp_date)
+        """Gets live data tables for calls and puts using yahoo fin then
+        filters them with get_df function"""
+        self.put_list = get_puts(self.stock, self.exp_date)
+        self.call_list = get_calls(self.stock, self.exp_date)
         self.put_list = self.get_df(self.put_list)
         self.call_list = self.get_df(self.call_list)
 
     def leg_assignments(self, legs):
+        """Assignment of call or put list to each leg"""
         self.leg1 = assign_leg_df(legs[0], self.put_list, self.call_list)
         self.leg2 = assign_leg_df(legs[1], self.put_list, self.call_list)
         self.leg3 = assign_leg_df(legs[2], self.put_list, self.call_list)
