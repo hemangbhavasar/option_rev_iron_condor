@@ -13,6 +13,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog
 import numpy as np
 import requests
+from rev_iron_condor import scan
+from settings import Settings, setup
 
 
 class Ui_Form(object):
@@ -293,7 +295,7 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
+        Form.setWindowTitle(_translate("Form", "Options Spread tracker"))
         self.get_stock_pb.setText(_translate("Form", "Get stock"))
         self.stock_label.setText(_translate("Form", "No stock selected"))
         self.exp_add_pb.setText(_translate("Form", "Add date ->"))
@@ -407,6 +409,7 @@ class Ui_Form(object):
         leg1_2_strat = self.spin_leg1_2.value()
         leg2_3_strat = self.spin_leg2_3.value()
         leg3_4_strat = self.spin_leg3_4.value()
+        strategy = [leg1_2_strat, leg2_3_strat, leg3_4_strat]
         variation = [self.spin_var_leg1_2.value(),
                      max(self.spin_var_leg1_2.value(),
                          self.spin_var_leg3_4.value()),
@@ -414,14 +417,19 @@ class Ui_Form(object):
         file_path = self.load_path_label.text()
         timer = self.spin_ever_min.value()
         commission_cost = self.dspin_commision_cost.value()
-        print(stock)
-        print(commission_cost)
-        print(exp_date_list)
-        print(legs)
-        print(leg1_2_strat, leg2_3_strat, leg3_4_strat)
-        print(variation)
-        print(file_path)
-        print(timer)
+
+        setup()
+        Form.hide()
+        log1 = Settings(stock=stock,
+                        strategy=strategy,
+                        variation=variation,
+                        exp_date=exp_date_list[0],
+                        timer=timer*60,
+                        legs=legs,
+                        volume_filter=500,
+                        file_path=file_path)
+        scan(log1)
+        Form.show()
 
 
 if __name__ == "__main__":

@@ -54,7 +54,7 @@ def assign_leg_sell(leg):
 class Settings:
     """Initialize all the settings here"""
     def __init__(self, stock, strategy, variation, exp_date, timer, legs,
-                 volume_filter):
+                 volume_filter, file_path):
         # The ticket or the underlying stock
         self.stock = stock
         # The interval desired for each leg of the iron condor in dollars.
@@ -70,6 +70,7 @@ class Settings:
         self.timer = timer
         self.open_days = ['Monday', 'Tuesday', 'Wednesday',  'Thursday',
                           'Friday']
+        self.file_path = file_path
         # The minimum volume for each option to be collected.
         self.volume_filter = volume_filter
         # Empty put and call list that will be assigned to legs once log

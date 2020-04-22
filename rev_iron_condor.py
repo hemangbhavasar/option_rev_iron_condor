@@ -42,8 +42,6 @@ Initial development phase
 """
 
 import numpy as np
-import pandas as pd
-from yahoo_fin.options import *
 from yahoo_fin.stock_info import *
 from datetime import datetime
 import time
@@ -129,16 +127,16 @@ def f_df_func(log):
     # data_frame = data_frame.reset_index()
     df2 = pd.DataFrame([data_frame['Cost'].max(), datetime.now()])
     df2 = df2.transpose()
-    append_df_to_excel('output.xlsx', data_frame,
+    append_df_to_excel(log.file_path, data_frame,
                        sheet_name=log.stock + sheet_name)
-    append_df_to_excel('output.xlsx', df2,
+    append_df_to_excel(log.file_path, df2,
                        sheet_name=log.stock + sheet_name + "_Min_cost",
                        index=False, header=None)
     print("Data was added to excel file for:" + log.stock + " @ " + str(
         datetime.now()))
-    # print(data_frame.to_string(index=False))
-    # print("\n")
-    # print(df2.to_string(index=False))
+    print(data_frame.to_string(index=False))
+    print("\n")
+    print(df2.to_string(index=False))
 
 
 def scan(log):
@@ -160,16 +158,14 @@ def scan(log):
 # ---------------------------------------------------------------------
 
 
-setup()
-legs = [['Put', 'Sell', 2], ['Put', 'Buy', 2], ['Call', 'Buy', 2], ['Call', 'Sell', 2]]
-log1 = Settings(stock='spy',
-                strategy=['5', '10', '5'],
-                variation=['2', '2', '2'],
-                exp_date='2020/05/15',
-                timer=600,
-                legs=legs,
-                volume_filter=500)
+
+# legs = [['Put', 'Sell', 2], ['Put', 'Buy', 2], ['Call', 'Buy', 2], ['Call', 'Sell', 2]]
+# log1 = Settings(stock='spy',
+#                 strategy=['5', '10', '5'],
+#                 variation=['2', '2', '2'],
+#                 exp_date='2020/05/15',
+#                 timer=600,
+#                 legs=legs,
+#                 volume_filter=500)
 
 # -----------------------------------------
-
-scan(log1)
